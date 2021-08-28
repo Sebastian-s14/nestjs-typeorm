@@ -7,6 +7,7 @@ import config from 'src/config';
 import { enviroments } from 'src/enviroments';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AppController } from './app.controller';
       isGlobal: true,
     }),
     DatabaseModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
