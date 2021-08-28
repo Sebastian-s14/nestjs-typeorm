@@ -8,6 +8,7 @@ import { enviroments } from 'src/enviroments';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { UsersModule } from './users/users.module';
+import { ModulesModule } from './modules/modules.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UsersModule } from './users/users.module';
     }),
     DatabaseModule,
     UsersModule,
+    ModulesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
