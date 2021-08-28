@@ -21,9 +21,9 @@ export class UsersService {
     return user;
   }
 
-  async findUserByEmail(email: string) {
+  async findUserByEmail(email: string, id?: number) {
     const existEmail = await this.userRepo.findOne({ where: { email } });
-    if (existEmail)
+    if (existEmail && existEmail.id !== id)
       throw new BadRequestException(
         `Ya existe un usuario con el email: ${email}`,
       );
@@ -57,6 +57,7 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.findUserById(id);
+    await this.findUserByEmail(updateUserDto.email, id);
     const mergeUser = this.userRepo.merge(user, updateUserDto);
     const updatedUser = await this.userRepo.save(mergeUser);
 
