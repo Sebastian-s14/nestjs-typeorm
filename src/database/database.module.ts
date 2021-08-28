@@ -24,6 +24,11 @@ import config from 'src/config';
           username,
           password,
           database,
+          autoLoadEntities: true,
+          synchronize: true,
+          ssl: {
+            rejectUnauthorized: false,
+          },
         };
       },
     }),
