@@ -6,7 +6,9 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
+
 import { ModulesService } from './modules.service';
 import { CreateModuleDto } from './dto/create-module.dto';
 import { UpdateModuleDto } from './dto/update-module.dto';
@@ -26,17 +28,25 @@ export class ModulesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.modulesService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.modulesService.findOne(id);
+  }
+
+  @Get(':id/users')
+  getUserByModule(@Param('id', ParseIntPipe) id: number) {
+    return this.modulesService.getUserByModule(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateModuleDto: UpdateModuleDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateModuleDto: UpdateModuleDto,
+  ) {
     return this.modulesService.update(+id, updateModuleDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.modulesService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.modulesService.remove(id);
   }
 }

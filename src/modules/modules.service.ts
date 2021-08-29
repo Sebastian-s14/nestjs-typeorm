@@ -17,11 +17,13 @@ export class ModulesService {
     @InjectRepository(Module) private moduleRepo: Repository<Module>,
   ) {}
 
-  async findModuleById(id: number) {
-    const module = await this.moduleRepo.findOne(id);
+  async findModuleById(id: number, withRelations?: boolean) {
+    let module = {} as Module;
+    module = await this.moduleRepo.findOne(id);
     if (!module)
       throw new NotFoundException(`Módulo con el id: #${id} no encontrado`);
-    // await this.findModuleByName(module.name);
+    if (withRelations)
+      module = await this.moduleRepo.findOne(id, { relations: ['users'] });
     return module;
   }
 
@@ -55,6 +57,14 @@ export class ModulesService {
     const module = await this.findModuleById(id);
     return {
       message: `This action returns a #${id} module`,
+      module,
+    };
+  }
+
+  async getUserByModule(id: number) {
+    const module = await this.findModuleById(id, true);
+    return {
+      message: `Usuarios con el módulo #${id}`,
       module,
     };
   }

@@ -10,5 +10,6 @@ import { ModulesController } from './modules.controller';
   imports: [TypeOrmModule.forFeature([Module1])],
   controllers: [ModulesController],
   providers: [ModulesService],
+  exports: [ModulesService, TypeOrmModule],
 })
 export class ModulesModule {}
