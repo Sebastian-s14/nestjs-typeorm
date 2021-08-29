@@ -44,7 +44,7 @@ export class User {
   @UpdateDateColumn({ type: 'timestamp' })
   updateAt: Date;
 
-  @ManyToOne(() => Type, (type) => type.users)
+  @ManyToOne(() => Type, (type) => type.users, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'type_id' })
   type: Type;
 

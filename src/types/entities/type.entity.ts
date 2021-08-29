@@ -22,6 +22,6 @@ export class Type {
   @UpdateDateColumn({ type: 'timestamp' })
   updateAt: Date;
 
-  @OneToMany(() => User, (user) => user.type)
+  @OneToMany(() => User, (user) => user.type, { onDelete: 'SET NULL' })
   users: User[];
 }
