@@ -1,12 +1,15 @@
 import { Exclude } from 'class-transformer';
 import { Module } from 'src/modules/entities/module.entity';
+import { Type } from 'src/types/entities/type.entity';
 
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -40,6 +43,10 @@ export class User {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updateAt: Date;
+
+  @ManyToOne(() => Type, (type) => type.users)
+  @JoinColumn({ name: 'type_id' })
+  type: Type;
 
   @ManyToMany(() => Module, (module) => module.users)
   @JoinTable({

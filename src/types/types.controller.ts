@@ -31,6 +31,11 @@ export class TypesController {
     return this.typesService.findOne(id);
   }
 
+  @Get(':id/users')
+  getUsersByType(@Param('id', ParseIntPipe) id: number) {
+    return this.typesService.getUsersByType(id);
+  }
+
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,

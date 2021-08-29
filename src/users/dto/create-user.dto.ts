@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsNotEmpty,
   IsOptional,
+  IsPositive,
   IsString,
   Length,
   MaxLength,
@@ -34,6 +35,10 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   readonly role: string;
+
+  @IsPositive()
+  @IsNotEmpty()
+  readonly typeId: number;
 
   @IsArray()
   @IsOptional()

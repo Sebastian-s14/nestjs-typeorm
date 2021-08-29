@@ -1,7 +1,9 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -19,4 +21,7 @@ export class Type {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updateAt: Date;
+
+  @OneToMany(() => User, (user) => user.type)
+  users: User[];
 }

@@ -8,20 +8,30 @@ import { Repository } from 'typeorm';
 
 import { User } from 'src/users/entities/user.entity';
 import { Module } from 'src/modules/entities/module.entity';
+import { TypesService } from 'src/types/types.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+// import { Type } from 'src/types/entities/type.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Module) private moduleRepo: Repository<Module>,
+    // @InjectRepository(Module) private typeRepo: Repository<Type>,
+    private typeService: TypesService,
   ) {}
 
-  async findUserById(id: number) {
-    const user = await this.userRepo.findOne(id, { relations: ['modules'] });
+  async findUserById(id: number, withRelations?: boolean) {
+    let user = {} as User;
+    user = await this.userRepo.findOne(id);
     if (!user) throw new NotFoundException(`User #${id} not found`);
+
+    if (withRelations)
+      user = await this.userRepo.findOne(id, {
+        relations: ['modules', 'type'],
+      });
     return user;
   }
 
@@ -36,6 +46,11 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     await this.findUserByEmail(createUserDto.email);
     const newUser = this.userRepo.create(createUserDto);
+    if (createUserDto.typeId) {
+      // const type = await this.typeRepo.findOne(createUserDto.typeId);
+      const type = await this.typeService.findTypeById(createUserDto.typeId);
+      newUser.type = type;
+    }
     if (createUserDto.modulesIds) {
       const modules = await this.moduleRepo.findByIds(createUserDto.modulesIds);
       newUser.modules = modules;
@@ -48,7 +63,7 @@ export class UsersService {
   }
 
   async findAll() {
-    const users = await this.userRepo.find({ relations: ['modules'] });
+    const users = await this.userRepo.find({ relations: ['modules', 'type'] });
     return {
       message: `This action returns all users`,
       users,
@@ -56,7 +71,7 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const user = await this.findUserById(id);
+    const user = await this.findUserById(id, true);
     return {
       meesage: `This action returns a #${id} user`,
       user,
@@ -66,8 +81,17 @@ export class UsersService {
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.findUserById(id);
     await this.findUserByEmail(updateUserDto.email, id);
-    const mergeUser = this.userRepo.merge(user, updateUserDto);
-    const updatedUser = await this.userRepo.save(mergeUser);
+    if (updateUserDto.typeId) {
+      // const type = await this.typeRepo.findOne(createUserDto.typeId);
+      const type = await this.typeService.findTypeById(updateUserDto.typeId);
+      user.type = type;
+    }
+    if (updateUserDto.modulesIds) {
+      const modules = await this.moduleRepo.findByIds(updateUserDto.modulesIds);
+      user.modules = modules;
+    }
+    this.userRepo.merge(user, updateUserDto);
+    const updatedUser = await this.userRepo.save(user);
 
     return {
       message: `This action updates a #${id} user`,

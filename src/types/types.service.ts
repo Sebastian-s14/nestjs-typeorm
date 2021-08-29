@@ -14,11 +14,14 @@ import { UpdateTypeDto } from './dto/update-type.dto';
 export class TypesService {
   constructor(@InjectRepository(Type) private typeRepo: Repository<Type>) {}
 
-  async findTypeById(id: number) {
-    const type = await this.typeRepo.findOne(id);
+  async findTypeById(id: number, withRelations?: boolean) {
+    let type = {} as Type;
+    type = await this.typeRepo.findOne(id);
     if (!type)
       throw new NotFoundException(`Tipo con el id: #${id} no encontrado`);
 
+    if (withRelations)
+      type = await this.typeRepo.findOne(id, { relations: ['users'] });
     return type;
   }
 
@@ -50,6 +53,14 @@ export class TypesService {
     const type = await this.findTypeById(id);
     return {
       message: `This action returns a #${id} type`,
+      type,
+    };
+  }
+
+  async getUsersByType(id: number) {
+    const type = await this.findTypeById(id, true);
+    return {
+      message: `Usuarios con el tipo #${id}`,
       type,
     };
   }
