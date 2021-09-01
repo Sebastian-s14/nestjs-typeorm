@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 import { User } from 'src/users/entities/user.entity';
 import { Module } from 'src/modules/entities/module.entity';
@@ -35,9 +36,18 @@ export class UsersService {
     return user;
   }
 
-  async findUserByEmail(email: string, id?: number) {
-    const existEmail = await this.userRepo.findOne({ where: { email } });
-    if (existEmail && existEmail.id !== id)
+  async findUserByEmail(email: string, id?: number, returnUser?: boolean) {
+    const existUser = await this.userRepo.findOne({ where: { email } });
+    // console.log('existUser');
+    // console.log(existUser);
+    // console.log(!!existUser);
+
+    if (returnUser && !existUser)
+      throw new BadRequestException(`No existe un usuario con el : ${email}`);
+
+    if (returnUser) return existUser;
+
+    if (existUser && existUser.id !== id)
       throw new BadRequestException(
         `Ya existe un usuario con el email: ${email}`,
       );
@@ -46,6 +56,9 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     await this.findUserByEmail(createUserDto.email);
     const newUser = this.userRepo.create(createUserDto);
+    const hashPassword = await bcrypt.hash(newUser.password, 10);
+    newUser.password = hashPassword;
+
     if (createUserDto.typeId) {
       // const type = await this.typeRepo.findOne(createUserDto.typeId);
       const type = await this.typeService.findTypeById(createUserDto.typeId);
